@@ -57,7 +57,8 @@ class Product extends Model
      */
     public function getFormattedPriceAttribute()
     {
-        return 'Rp ' . number_format($this->price, 0, ',', '.');
+        // Cast ke float untuk menghindari error "decimal given"
+        return 'Rp ' . number_format((float) $this->price, 0, ',', '.');
     }
 
     /**

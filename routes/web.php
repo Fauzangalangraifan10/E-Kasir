@@ -72,6 +72,9 @@ Route::middleware(['auth'])->group(function () {
 
         // Kategori hanya bisa dilihat
         Route::resource('categories', CategoryController::class)->only(['index', 'show']);
+        Route::middleware(['auth', 'role:admin,kasir'])->group(function () {
+            Route::resource('categories', CategoryController::class);
+        });
 
         // Laporan
         Route::prefix('reports')->name('reports.')->group(function () {

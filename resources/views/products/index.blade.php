@@ -6,14 +6,49 @@
         width: 1em !important;
         height: 1em !important;
     }
+
+    /* Mengecilkan ukuran font di dalam card */
+    .card-body {
+        font-size: 0.9rem;
+    }
+
+    /* Mengecilkan header card */
+    .card-header {
+        padding: 0.5rem 1rem !important;
+    }
+
+    /* Membatasi lebar container agar tidak terlalu besar */
+    .container-fluid {
+        max-width: 2000px;
+        margin: 0 auto;
+    }
+
+    /* Mengecilkan ukuran tombol filter form */
+    .form-control,
+    .form-select {
+        font-size: 0.9rem;
+        padding: 0.35rem 0.5rem;
+    }
+
+    .btn {
+        font-size: 0.85rem;
+        padding: 0.35rem 0.6rem;
+    }
+
+    /* Mengecilkan ukuran tabel */
+    .table td,
+    .table th {
+        padding: 0.4rem;
+        vertical-align: middle;
+    }
 </style>
 
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
-            <div class="card">
+            <div class="card shadow-sm">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h3 class="card-title">Daftar Produk</h3>
+                    <h3 class="card-title mb-0">Daftar Produk</h3>
                     <div>
                         @if(!auth()->user()->role || auth()->user()->role !== 'kasir')
                             <a href="{{ route('products.low-stock') }}" class="btn btn-warning btn-sm me-2">
@@ -30,8 +65,8 @@
                 </div>
 
                 <div class="card-body">
-                    <form method="GET" class="mb-4">
-                        <div class="row">
+                    <form method="GET" class="mb-3">
+                        <div class="row g-2">
                             <div class="col-md-4">
                                 <input type="text"
                                        name="search"
@@ -65,23 +100,23 @@
                     </form>
 
                     @if(session('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <div class="alert alert-success alert-dismissible fade show py-2" role="alert">
                             {{ session('success') }}
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     @endif
 
                     @if(session('error'))
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <div class="alert alert-danger alert-dismissible fade show py-2" role="alert">
                             {{ session('error') }}
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     @endif
 
                     @if(session('import_errors'))
-                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        <div class="alert alert-warning alert-dismissible fade show py-2" role="alert">
                             <strong>Peringatan!</strong> Beberapa produk gagal diimport:
-                            <ul>
+                            <ul class="mb-0">
                                 @foreach(session('import_errors') as $error)
                                     <li>{{ $error }}</li>
                                 @endforeach
@@ -91,7 +126,7 @@
                     @endif
 
                     <div class="table-responsive">
-                        <table class="table table-striped">
+                        <table class="table table-striped table-sm">
                             <thead>
                                 <tr>
                                     <th>Gambar</th>
@@ -112,10 +147,10 @@
                                                 <img src="{{ asset('storage/products/' . $product->image) }}"
                                                      alt="{{ $product->name }}"
                                                      class="img-thumbnail"
-                                                     style="width: 50px; height: 50px; object-fit: cover;">
+                                                     style="width: 40px; height: 40px; object-fit: cover;">
                                             @else
                                                 <div class="bg-light d-flex align-items-center justify-content-center"
-                                                     style="width: 50px; height: 50px;">
+                                                     style="width: 40px; height: 40px;">
                                                     <i class="fas fa-image text-muted"></i>
                                                 </div>
                                             @endif
