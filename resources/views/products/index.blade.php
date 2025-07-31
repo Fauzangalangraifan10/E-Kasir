@@ -1,6 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
+<style>
+    .pagination svg {
+        width: 1em !important;
+        height: 1em !important;
+    }
+</style>
+
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
@@ -15,7 +22,7 @@
                             <a href="{{ route('products.bulk-import') }}" class="btn btn-info btn-sm me-2">
                                 <i class="fas fa-upload"></i> Import CSV
                             </a>
-                            <a href="{{ route('products.create') }}" class="btn btn-primary">
+                            <a href="{{ route('products.create') }}" class="btn btn-primary btn-sm">
                                 <i class="fas fa-plus"></i> Tambah Produk
                             </a>
                         @endif
@@ -173,7 +180,7 @@
                         </table>
                     </div>
 
-                    {{ $products->links() }}
+                    {{ $products->withQueryString()->links('pagination::bootstrap-5') }}
                 </div>
             </div>
         </div>

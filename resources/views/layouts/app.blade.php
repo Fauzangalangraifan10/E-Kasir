@@ -16,7 +16,7 @@
     <style>
         :root {
             --sidebar-bg: #e8f5e9;
-            --sidebar-width: 260px;
+            --sidebar-width: 200px; /* Sidebar lebih kecil */
             --content-bg: #ffffff;
             --active-color: #2e7d32;
             --hover-color: #c8e6c9;
@@ -44,11 +44,11 @@
         }
 
         .sidebar.collapsed {
-            margin-left: -260px;
+            margin-left: -200px;
         }
 
         .sidebar-brand {
-            padding: 1.5rem 1rem;
+            padding: 1rem;
             text-align: center;
             border-bottom: 1px solid #c8e6c9;
         }
@@ -60,12 +60,12 @@
         }
 
         .sidebar-brand img {
-            height: 60px;
-            margin-right: 10px;
+            height: 45px;
+            margin-right: 8px;
         }
 
         .sidebar-brand .brand-text {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             font-weight: bold;
             color: #2e7d32;
         }
@@ -82,19 +82,19 @@
         }
 
         .sidebar-nav .nav-link {
-            padding: 0.9rem 1.2rem;
+            padding: 0.7rem 1rem;
             color: #333;
             display: flex;
             align-items: center;
-            font-size: 1rem;
+            font-size: 0.9rem;
             transition: all 0.2s;
         }
 
         .sidebar-nav .nav-link i {
-            margin-right: 10px;
-            width: 20px;
+            margin-right: 8px;
+            width: 18px;
             text-align: center;
-            font-size: 1.1rem;
+            font-size: 1rem;
         }
 
         .sidebar-nav .nav-link:hover {
@@ -129,7 +129,7 @@
             justify-content: space-between;
             align-items: center;
             background-color: #fff;
-            padding: 10px 20px;
+            padding: 8px 15px;
             border-bottom: 1px solid #ddd;
             position: sticky;
             top: 0;
@@ -139,26 +139,27 @@
         .hamburger-btn {
             background: none;
             border: none;
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             color: #2e7d32;
         }
 
         .user-menu {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
         }
 
         .user-menu .username {
             font-weight: bold;
             color: #2e7d32;
+            font-size: 0.9rem;
         }
 
         .logout-btn {
             background: none;
             border: none;
             color: #333;
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             cursor: pointer;
         }
 
@@ -170,7 +171,7 @@
         @media (max-width: 768px) {
             .sidebar {
                 position: fixed;
-                margin-left: -260px;
+                margin-left: -200px;
             }
 
             .sidebar.show {
@@ -247,7 +248,7 @@
         </div>
 
         <!-- Page Content -->
-        <div class="p-4">
+        <div class="p-3">
             @yield('content')
         </div>
     </div>

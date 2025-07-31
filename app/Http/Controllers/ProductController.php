@@ -105,7 +105,6 @@ class ProductController extends Controller
 
     public function show(Product $product)
     {
-        // Load histori transaksi beserta transaksi agar tanggal, harga, subtotal bisa ditampilkan
         $product->load(['category', 'transactionDetails.transaction']);
         return view('products.show', compact('product'));
     }
