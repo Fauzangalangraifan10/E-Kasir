@@ -8,15 +8,17 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h3 class="card-title">Daftar Produk</h3>
                     <div>
-                        <a href="{{ route('products.low-stock') }}" class="btn btn-warning btn-sm me-2">
-                            <i class="fas fa-exclamation-triangle"></i> Stok Menipis
-                        </a>
-                        <a href="{{ route('products.bulk-import') }}" class="btn btn-info btn-sm me-2">
-                            <i class="fas fa-upload"></i> Import CSV
-                        </a>
-                        <a href="{{ route('products.create') }}" class="btn btn-primary">
-                            <i class="fas fa-plus"></i> Tambah Produk
-                        </a>
+                        @if(!auth()->user()->role || auth()->user()->role !== 'kasir')
+                            <a href="{{ route('products.low-stock') }}" class="btn btn-warning btn-sm me-2">
+                                <i class="fas fa-exclamation-triangle"></i> Stok Menipis
+                            </a>
+                            <a href="{{ route('products.bulk-import') }}" class="btn btn-info btn-sm me-2">
+                                <i class="fas fa-upload"></i> Import CSV
+                            </a>
+                            <a href="{{ route('products.create') }}" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Tambah Produk
+                            </a>
+                        @endif
                     </div>
                 </div>
 
@@ -145,17 +147,20 @@
                                                 <a href="{{ route('products.show', $product) }}" class="btn btn-sm btn-info">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
-                                                <a href="{{ route('products.edit', $product) }}" class="btn btn-sm btn-warning">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-                                                <form action="{{ route('products.destroy', $product) }}" method="POST" class="d-inline"
-                                                      onsubmit="return confirm('Yakin ingin menghapus produk ini? Tindakan ini tidak dapat dibatalkan.')">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-danger">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </form>
+
+                                                @if(!auth()->user()->role || auth()->user()->role !== 'kasir')
+                                                    <a href="{{ route('products.edit', $product) }}" class="btn btn-sm btn-warning">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <form action="{{ route('products.destroy', $product) }}" method="POST" class="d-inline"
+                                                          onsubmit="return confirm('Yakin ingin menghapus produk ini? Tindakan ini tidak dapat dibatalkan.')">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-sm btn-danger">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                @endif
                                             </div>
                                         </td>
                                     </tr>

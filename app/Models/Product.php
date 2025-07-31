@@ -27,37 +27,50 @@ class Product extends Model
         'is_active' => 'boolean'
     ];
 
-    // Relationship dengan category
+    /**
+     * Relationship dengan category
+     */
     public function category()
     {
         return $this->belongsTo(Category::class);
     }
 
-    // Relationship dengan transaction details
+    /**
+     * Relationship dengan transaction details
+     */
     public function transactionDetails()
     {
-        return $this->hasMany(TransactionDetail::class);
+        return $this->hasMany(TransactionDetail::class)
+                    ->with('transaction'); // Pastikan relasi transaction ikut dimuat
     }
 
-    // Check if stock is low
+    /**
+     * Mengecek apakah stok rendah
+     */
     public function getIsLowStockAttribute()
     {
         return $this->stock <= $this->min_stock;
     }
 
-    // Get formatted price
+    /**
+     * Mendapatkan harga yang sudah diformat
+     */
     public function getFormattedPriceAttribute()
     {
         return 'Rp ' . number_format($this->price, 0, ',', '.');
     }
 
-    // Scope for active products
+    /**
+     * Scope untuk produk aktif
+     */
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
     }
 
-    // Scope for low stock products
+    /**
+     * Scope untuk produk dengan stok rendah
+     */
     public function scopeLowStock($query)
     {
         return $query->whereRaw('stock <= min_stock');

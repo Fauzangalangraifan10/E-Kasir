@@ -76,6 +76,8 @@ class ReportController extends Controller
         return view('reports.sales', compact('sales', 'startDate', 'endDate'));
     }
 
+
+    
     public function stockReport(Request $request)
     {
         $products = Product::orderBy('stock', 'asc')->get();
@@ -113,6 +115,7 @@ class ReportController extends Controller
             $writer->save('php://output');
             exit;
         }
+        
 
         return view('reports.stock', compact('products'));
     }

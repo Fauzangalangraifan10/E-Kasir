@@ -4,40 +4,40 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h3 class="card-title">Detail Produk: {{ $product->name }}</h3>
+            <div class="card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center bg-success text-white">
+                    <h3 class="card-title mb-0">Detail Produk: {{ $product->name }}</h3>
                     <div>
                         {{-- Tombol Edit Produk --}}
                         <a href="{{ route('products.edit', $product) }}" class="btn btn-warning btn-sm me-2">
                             <i class="fas fa-edit"></i> Edit Produk
                         </a>
                         {{-- Tombol Kembali ke Daftar Produk --}}
-                        <a href="{{ route('products.index') }}" class="btn btn-secondary btn-sm">
+                        <a href="{{ route('products.index') }}" class="btn btn-light btn-sm">
                             <i class="fas fa-arrow-left"></i> Kembali
                         </a>
                     </div>
                 </div>
 
                 <div class="card-body">
-                    <div class="row">
+                    <div class="row mb-4">
                         <div class="col-md-4 text-center">
                             {{-- Menampilkan gambar produk jika ada --}}
                             @if($product->image)
                                 <img src="{{ Storage::url('products/' . $product->image) }}"
                                      alt="{{ $product->name }}"
-                                     class="img-fluid rounded"
+                                     class="img-fluid rounded border"
                                      style="max-width: 200px; height: auto;">
                             @else
                                 {{-- Placeholder jika tidak ada gambar --}}
-                                <div class="bg-light d-flex align-items-center justify-content-center rounded"
+                                <div class="bg-light d-flex align-items-center justify-content-center rounded border"
                                      style="width: 200px; height: 200px; margin: 0 auto;">
-                                    <i class="fas fa-image fa-5x text-muted"></i>
+                                    <i class="fas fa-image fa-4x text-muted"></i>
                                 </div>
                             @endif
                         </div>
                         <div class="col-md-8">
-                            <dl class="row">
+                            <dl class="row mb-0">
                                 <dt class="col-sm-4">Nama Produk:</dt>
                                 <dd class="col-sm-8">{{ $product->name }}</dd>
 
@@ -54,13 +54,15 @@
                                 <dd class="col-sm-8"><code>{{ $product->barcode ?: '-' }}</code></dd>
 
                                 <dt class="col-sm-4">Harga:</dt>
-                                {{-- Menggunakan accessor formatted_price (jika ada) atau format manual --}}
-                                <dd class="col-sm-8">{{ $product->formatted_price ?? 'Rp ' . number_format($product->price, 0, ',', '.') }}</dd>
+                                <dd class="col-sm-8">Rp {{ number_format($product->price, 0, ',', '.') }}</dd>
 
                                 <dt class="col-sm-4">Stok:</dt>
                                 <dd class="col-sm-8">
-                                    {{-- Menampilkan badge stok berdasarkan kondisi --}}
-                                    <span class="badge {{ $product->is_low_stock ? 'bg-danger' : ($product->stock == 0 ? 'bg-dark' : 'bg-success') }}">
+                                    <span class="badge 
+                                        @if($product->stock == 0) bg-dark 
+                                        @elseif($product->is_low_stock) bg-danger 
+                                        @else bg-success 
+                                        @endif">
                                         {{ $product->stock }}
                                     </span>
                                     @if($product->is_low_stock)
@@ -90,18 +92,18 @@
                             </dl>
                         </div>
                     </div>
+                    
 
                     {{-- Bagian Histori Transaksi Produk Ini --}}
-                    {{-- Ini akan ditampilkan jika ada relasi transactionDetails dan transaction di model Product --}}
+                    <hr>
+                    <h5 class="mt-4">Histori Transaksi Produk Ini:</h5>
                     @if($product->transactionDetails->isNotEmpty())
-                        <hr>
-                        <h5>Histori Transaksi Produk Ini:</h5>
-                        <div class="table-responsive">
-                            <table class="table table-sm table-bordered">
-                                <thead>
-                                    <tr>
+                        <div class="table-responsive mt-3">
+                            <table class="table table-sm table-bordered align-middle">
+                                <thead class="table-success">
+                                    <tr class="text-center">
                                         <th>Kode Transaksi</th>
-                                        <th>Tanggal</th>
+                                        <th>Tanggal Pembelian</th>
                                         <th>Jumlah Beli</th>
                                         <th>Harga Saat Itu</th>
                                         <th>Subtotal</th>
@@ -109,26 +111,33 @@
                                 </thead>
                                 <tbody>
                                     @foreach($product->transactionDetails as $detail)
-                                        <tr>
+                                        @php $transaction = $detail->transaction; @endphp
+                                        <tr class="text-center">
                                             <td>
-                                                {{-- Link ke detail transaksi --}}
-                                                <a href="{{ route('transactions.show', $detail->transaction->id) }}">
-                                                    {{ $detail->transaction->transaction_code }}
-                                                </a>
+                                                @if($transaction)
+                                                    <a href="{{ route('transactions.show', $transaction->id) }}">
+                                                        {{ $transaction->transaction_code }}
+                                                    </a>
+                                                @else
+                                                    <span class="text-muted">-</span>
+                                                @endif
                                             </td>
-                                            <td>{{ $detail->transaction->transaction_date->format('d M Y H:i') }}</td>
+                                            <td>
+                                                {{ $transaction 
+                                                    ? $transaction->created_at->format('d M Y H:i') 
+                                                    : '-' }}
+                                            </td>
                                             <td>{{ $detail->quantity }}</td>
-                                            <td>Rp {{ number_format($detail->price_at_transaction, 0, ',', '.') }}</td>
-                                            <td>Rp {{ number_format($detail->quantity * $detail->price_at_transaction, 0, ',', '.') }}</td>
+                                            <td>Rp {{ number_format($detail->price ?? 0, 0, ',', '.') }}</td>
+                                            <td>Rp {{ number_format($detail->subtotal ?? ($detail->quantity * ($detail->price ?? 0)), 0, ',', '.') }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
                             </table>
                         </div>
                     @else
-                        <p class="text-muted text-center mt-4">Belum ada histori transaksi untuk produk ini.</p>
+                        <p class="text-muted text-center mt-3">Belum ada histori transaksi untuk produk ini.</p>
                     @endif
-
                 </div>
             </div>
         </div>

@@ -13,7 +13,7 @@ class TransactionDetail extends Model
         'transaction_id',
         'product_id',
         'quantity',
-        'price',
+        'price_at_transaction', // disesuaikan agar sama dengan yang dipakai di view
         'subtotal',
     ];
 

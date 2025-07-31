@@ -40,17 +40,27 @@ class ProductController extends Controller
         $products = $query->latest()->paginate(10);
         $categories = Category::all();
 
-        return view('products.index', compact('products', 'categories'));
+        $isKasir = auth()->check() && auth()->user()->role === 'kasir';
+
+        return view('products.index', compact('products', 'categories', 'isKasir'));
     }
 
     public function create()
     {
+        if (auth()->user()->role === 'kasir') {
+            return redirect()->route('products.index')->with('warning', 'Kasir tidak memiliki akses untuk menambah produk.');
+        }
+
         $categories = Category::all();
         return view('products.create', compact('categories'));
     }
 
     public function store(Request $request)
     {
+        if (auth()->user()->role === 'kasir') {
+            return redirect()->route('products.index')->with('warning', 'Kasir tidak memiliki akses untuk menambah produk.');
+        }
+
         $request->validate([
             'name'        => ['required', 'string', 'max:255', Rule::unique('products', 'name')],
             'category_id' => 'nullable|exists:categories,id',
@@ -58,9 +68,9 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'price'       => 'required|numeric|min:0',
-            'stock'      => 'required|integer|min:0',
-            'min_stock'  => 'required|integer|min:0',
-            'is_active'  => 'boolean',
+            'stock'       => 'required|integer|min:0',
+            'min_stock'   => 'required|integer|min:0',
+            'is_active'   => 'boolean',
         ]);
 
         try {
@@ -69,7 +79,7 @@ class ProductController extends Controller
 
             if ($request->hasFile('image')) {
                 $image = $request->file('image');
-                $path = $image->store('products', 'public'); // simpan ke storage/app/public/products
+                $path = $image->store('products', 'public');
                 $data['image'] = basename($path);
             } else {
                 $data['image'] = null;
@@ -95,18 +105,27 @@ class ProductController extends Controller
 
     public function show(Product $product)
     {
-        $product->load('category', 'transactionDetails.transaction');
+        // Load histori transaksi beserta transaksi agar tanggal, harga, subtotal bisa ditampilkan
+        $product->load(['category', 'transactionDetails.transaction']);
         return view('products.show', compact('product'));
     }
 
     public function edit(Product $product)
     {
+        if (auth()->user()->role === 'kasir') {
+            return redirect()->route('products.index')->with('warning', 'Kasir tidak memiliki akses untuk mengedit produk.');
+        }
+
         $categories = Category::all();
         return view('products.edit', compact('product', 'categories'));
     }
 
     public function update(Request $request, Product $product)
     {
+        if (auth()->user()->role === 'kasir') {
+            return redirect()->route('products.index')->with('warning', 'Kasir tidak memiliki akses untuk mengedit produk.');
+        }
+
         $request->validate([
             'name'        => ['required', 'string', 'max:255', Rule::unique('products', 'name')->ignore($product->id)],
             'category_id' => 'nullable|exists:categories,id',
@@ -160,6 +179,10 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
+        if (auth()->user()->role === 'kasir') {
+            return redirect()->route('products.index')->with('warning', 'Kasir tidak memiliki akses untuk menghapus produk.');
+        }
+
         try {
             if ($product->transactionDetails()->count() > 0) {
                 return redirect()->route('products.index')->with('error', 'Tidak dapat menghapus produk yang sudah memiliki transaksi.');
@@ -190,11 +213,19 @@ class ProductController extends Controller
 
     public function bulkImport()
     {
+        if (auth()->user()->role === 'kasir') {
+            return redirect()->route('products.index')->with('warning', 'Kasir tidak memiliki akses untuk import produk.');
+        }
+
         return view('products.bulk-import');
     }
 
     public function processBulkImport(Request $request)
     {
+        if (auth()->user()->role === 'kasir') {
+            return redirect()->route('products.index')->with('warning', 'Kasir tidak memiliki akses untuk import produk.');
+        }
+
         $request->validate([
             'file' => 'required|mimes:csv,txt|max:2048'
         ]);
@@ -297,6 +328,10 @@ class ProductController extends Controller
 
     public function downloadTemplate()
     {
+        if (auth()->user()->role === 'kasir') {
+            return redirect()->route('products.index')->with('warning', 'Kasir tidak memiliki akses untuk mengunduh template produk.');
+        }
+
         $headers = [
             "Content-type"        => "text/csv",
             "Content-Disposition" => "attachment; filename=template_produk.csv",
