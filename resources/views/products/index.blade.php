@@ -7,23 +7,19 @@
         height: 1em !important;
     }
 
-    /* Mengecilkan ukuran font di dalam card */
     .card-body {
         font-size: 0.9rem;
     }
 
-    /* Mengecilkan header card */
     .card-header {
         padding: 0.5rem 1rem !important;
     }
 
-    /* Membatasi lebar container agar tidak terlalu besar */
     .container-fluid {
         max-width: 2000px;
         margin: 0 auto;
     }
 
-    /* Mengecilkan ukuran tombol filter form */
     .form-control,
     .form-select {
         font-size: 0.9rem;
@@ -35,7 +31,6 @@
         padding: 0.35rem 0.6rem;
     }
 
-    /* Mengecilkan ukuran tabel */
     .table td,
     .table th {
         padding: 0.4rem;
@@ -99,8 +94,9 @@
                         </div>
                     </form>
 
+                    {{-- ALERT: tampil hanya setelah redirect dari store/update --}}
                     @if(session('success'))
-                        <div class="alert alert-success alert-dismissible fade show py-2" role="alert">
+                        <div id="success-alert" class="alert alert-success alert-dismissible fade show py-2" role="alert">
                             {{ session('success') }}
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
@@ -221,4 +217,17 @@
         </div>
     </div>
 </div>
+
+{{-- Script untuk auto-hide alert --}}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const successAlert = document.getElementById('success-alert');
+        if (successAlert) {
+            setTimeout(() => {
+                successAlert.classList.remove('show');
+                successAlert.classList.add('fade');
+            }, 3000); // Hilang setelah 3 detik
+        }
+    });
+</script>
 @endsection

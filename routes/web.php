@@ -27,6 +27,16 @@ Route::get('/', function () {
     return view('auth.login');
 });
 
+// TARUH INI DI ATAS
+Route::get('/products/download-template', [ProductController::class, 'downloadTemplate'])->name('products.download-template');
+Route::get('/products/low-stock', [ProductController::class, 'lowStock'])->name('products.low-stock');
+Route::get('/products/bulk-import', [ProductController::class, 'bulkImport'])->name('products.bulk-import');
+Route::post('/products/bulk-import', [ProductController::class, 'processBulkImport'])->name('products.process-bulk-import');
+
+// BARU SETELAH ITU
+Route::resource('products', ProductController::class);
+
+
 // Rute yang membutuhkan otentikasi (login)
 Route::middleware(['auth'])->group(function () {
 
@@ -56,12 +66,7 @@ Route::middleware(['auth'])->group(function () {
     // Category Management (CRUD resource)
     Route::resource('categories', CategoryController::class);
 
-    // Product Management (CRUD resource dan rute kustom)
-    Route::resource('products', ProductController::class);
-    Route::get('/products/download-template', [ProductController::class, 'downloadTemplate'])->name('products.download-template');
-    Route::get('/products/low-stock', [ProductController::class, 'lowStock'])->name('products.low-stock');
-    Route::get('/products/bulk-import', [ProductController::class, 'bulkImport'])->name('products.bulk-import');
-    Route::post('/products/bulk-import', [ProductController::class, 'processBulkImport'])->name('products.process-bulk-import');
+    
 
     // Transaction Management (CRUD resource dan rute kustom)
     // Gunakan 'except' untuk mencegah pembuatan rute 'show' default
