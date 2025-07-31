@@ -19,14 +19,10 @@ class TransactionController extends Controller
     public function index(Request $request)
     {
         $paymentMethod = $request->input('payment_method');
-        $search = $request->input('search'); // Tambahan untuk pencarian kode transaksi
 
         $transactions = Transaction::with('details')
             ->when($paymentMethod, function ($query) use ($paymentMethod) {
                 $query->where('payment_method', $paymentMethod);
-            })
-            ->when($search, function ($query) use ($search) { // Logika pencarian
-                $query->where('transaction_code', 'LIKE', "%{$search}%");
             })
             ->latest()
             ->get();
@@ -38,8 +34,7 @@ class TransactionController extends Controller
             'qris' => 'QRIS',
         ];
 
-        return view('transactions.index', compact('transactions', 'paymentMethod', 'paymentMethods'))
-            ->with('search', $search); // Kirim nilai pencarian ke view
+        return view('transactions.index', compact('transactions', 'paymentMethod', 'paymentMethods'));
     }
 
     /**

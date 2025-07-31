@@ -81,10 +81,10 @@
                     <label for="payment_method" class="form-label">Metode Pembayaran</label>
                     <select class="form-select" id="payment_method" name="payment_method" required>
                         <option value="">Pilih Metode Pembayaran</option>
-                        <option value="cash">💵 Tunai</option>
-                        <option value="ewallet">📱 E-Wallet</option>
-                        <option value="banking">🏦 M-Banking</option>
-                        <option value="qris">🔳 QRIS</option>
+                        <option value="cash">Tunai</option>
+                        <option value="ewallet">E-Wallet</option>
+                        <option value="banking">M-Banking</option>
+                        <option value="qris">QRIS</option>
                     </select>
                     @error('payment_method')
                         <div class="text-danger">{{ $message }}</div>
