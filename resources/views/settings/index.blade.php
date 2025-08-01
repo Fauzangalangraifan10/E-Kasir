@@ -25,7 +25,6 @@
             </li>
         </ul>
 
-        <!-- Tab Content -->
         <div class="tab-content" id="settingsTabContent">
             <!-- Profil Toko -->
             <div class="tab-pane fade show active" id="profile" role="tabpanel">
@@ -81,7 +80,7 @@
                     <div class="row g-3">
                         <div class="col-md-4">
                             <label class="form-label">Nama Metode</label>
-                            <input type="text" name="name" class="form-control" placeholder="Contoh: QRIS, BCA, OVO" required>
+                            <input type="text" name="name" class="form-control" placeholder="Contoh: QRIS, Tunai" required>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Nomor Akun</label>

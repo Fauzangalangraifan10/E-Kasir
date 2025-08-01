@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Transaction;
 use App\Models\TransactionDetail;
 use App\Models\Product;
+use App\Models\PaymentMethod;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -43,7 +44,9 @@ class TransactionController extends Controller
     public function create()
     {
         $products = Product::all();
-        return view('transactions.create', compact('products'));
+        $payments = PaymentMethod::where('is_active', 1)->get();
+
+        return view('transactions.create', compact('products', 'payments'));
     }
 
     /**
@@ -51,15 +54,22 @@ class TransactionController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        // Jika QRIS, jumlah bayar akan otomatis sama dengan total belanja
+        $rules = [
             'payment_method' => 'required|string|in:cash,ewallet,banking,qris',
-            'paid' => 'required|numeric|min:0',
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.quantity' => 'required|integer|min:1',
             'items.*.price' => 'required|numeric|min:0',
             'items.*.subtotal' => 'required|numeric|min:0',
-        ]);
+        ];
+
+        // Hanya validasi "paid" jika metode pembayaran bukan QRIS
+        if ($request->payment_method !== 'qris') {
+            $rules['paid'] = 'required|numeric|min:0';
+        }
+
+        $request->validate($rules);
 
         DB::beginTransaction();
 
@@ -67,6 +77,7 @@ class TransactionController extends Controller
             $calculatedTotalPrice = 0;
             $transactionDetailsData = [];
 
+            // Hitung total harga dan cek stok produk
             foreach ($request->items as $itemData) {
                 $product = Product::find($itemData['product_id']);
 
@@ -86,7 +97,6 @@ class TransactionController extends Controller
 
                 $itemPrice = $product->price;
                 $itemSubtotal = $itemPrice * $itemData['quantity'];
-
                 $calculatedTotalPrice += $itemSubtotal;
 
                 $transactionDetailsData[] = [
@@ -97,25 +107,37 @@ class TransactionController extends Controller
                 ];
             }
 
-            if ($request->paid < $calculatedTotalPrice) {
-                DB::rollBack();
-                return redirect()->back()->withErrors([
-                    'paid' => 'Jumlah bayar tidak mencukupi total belanja. Total: ' . number_format($calculatedTotalPrice) . ', Dibayar: ' . number_format($request->paid)
-                ])->withInput();
+            // Jika QRIS: auto-set jumlah bayar sama dengan total belanja
+            if ($request->payment_method === 'qris') {
+                $paidAmount = $calculatedTotalPrice;
+                $changeAmount = 0;
+            } else {
+                // Cek jika jumlah bayar mencukupi
+                if ($request->paid < $calculatedTotalPrice) {
+                    DB::rollBack();
+                    return redirect()->back()->withErrors([
+                        'paid' => 'Jumlah bayar tidak mencukupi total belanja. Total: ' . number_format($calculatedTotalPrice) . ', Dibayar: ' . number_format($request->paid)
+                    ])->withInput();
+                }
+
+                $paidAmount = $request->paid;
+                $changeAmount = $paidAmount - $calculatedTotalPrice;
             }
 
-            $changeAmount = $request->paid - $calculatedTotalPrice;
+            // Buat kode transaksi unik
             $transactionCode = 'TRX-' . date('YmdHis') . '-' . Str::random(5);
 
+            // Simpan transaksi
             $transaction = Transaction::create([
                 'user_id' => auth()->id(),
                 'transaction_code' => $transactionCode,
                 'total_price' => $calculatedTotalPrice,
-                'paid' => $request->paid,
+                'paid' => $paidAmount,
                 'change' => $changeAmount,
                 'payment_method' => $request->payment_method,
             ]);
 
+            // Simpan detail transaksi dan update stok produk
             foreach ($transactionDetailsData as $itemData) {
                 $itemData['transaction_id'] = $transaction->id;
                 TransactionDetail::create($itemData);
@@ -178,7 +200,6 @@ class TransactionController extends Controller
     {
         DB::beginTransaction();
         try {
-            // Tidak mengembalikan stok produk
             $transaction->details()->delete();
             $transaction->delete();
 

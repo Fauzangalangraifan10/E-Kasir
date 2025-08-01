@@ -20,9 +20,7 @@
 
         {{-- Bagian Pencarian Produk --}}
         <div class="card mb-4">
-            <div class="card-header">
-                Pilih Produk
-            </div>
+            <div class="card-header">Pilih Produk</div>
             <div class="card-body">
                 <div class="mb-3">
                     <label for="product_search" class="form-label">Cari Produk</label>
@@ -36,9 +34,7 @@
 
         {{-- Tabel Keranjang Belanja --}}
         <div class="card mb-4">
-            <div class="card-header">
-                Keranjang Belanja
-            </div>
+            <div class="card-header">Keranjang Belanja</div>
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-bordered" id="cartTable">
@@ -73,25 +69,36 @@
 
         {{-- Detail Pembayaran --}}
         <div class="card mb-4">
-            <div class="card-header">
-                Detail Pembayaran
-            </div>
+            <div class="card-header">Detail Pembayaran</div>
             <div class="card-body">
                 <div class="mb-3">
                     <label for="payment_method" class="form-label">Metode Pembayaran</label>
                     <select class="form-select" id="payment_method" name="payment_method" required>
                         <option value="">Pilih Metode Pembayaran</option>
                         <option value="cash">Tunai</option>
-                        <option value="ewallet">E-Wallet</option>
-                        <option value="banking">M-Banking</option>
-                        <option value="qris">QRIS</option>
+                        @foreach($payments as $payment)
+                            @if(strtolower($payment->name) === 'qris')
+                                <option value="qris" data-qr="{{ $payment->qr_code ? asset('storage/'.$payment->qr_code) : '' }}">
+                                    QRIS
+                                </option>
+                            @endif
+                        @endforeach
                     </select>
                     @error('payment_method')
                         <div class="text-danger">{{ $message }}</div>
                     @enderror
                 </div>
 
-                <div class="mb-3">
+                {{-- QRIS Preview --}}
+                <div class="mb-3" id="qr-container" style="display:none;">
+                    <label class="form-label">Scan QR Code</label>
+                    <div>
+                        <img id="qr-image" src="" alt="QRIS" style="max-height:200px;">
+                    </div>
+                </div>
+
+                {{-- Jumlah Bayar --}}
+                <div class="mb-3" id="paid-section">
                     <label for="paid" class="form-label">Jumlah Bayar</label>
                     <input type="number" name="paid" id="paid" class="form-control" step="any" min="0" required>
                     <div class="invalid-feedback" id="paid-feedback"></div>
@@ -100,7 +107,8 @@
                     @enderror
                 </div>
 
-                <div class="mb-3">
+                {{-- Kembalian --}}
+                <div class="mb-3" id="change-section">
                     <label for="change_display" class="form-label">Kembalian</label>
                     <input type="text" id="change_display" class="form-control fw-bold" value="Rp 0" readonly>
                     <input type="hidden" name="change" id="change_hidden">
@@ -126,6 +134,10 @@
         const changeInputHidden = document.getElementById('change_hidden');
         const processPaymentBtn = document.getElementById('processPaymentBtn');
         const paymentMethodSelect = document.getElementById('payment_method');
+        const qrContainer = document.getElementById('qr-container');
+        const qrImage = document.getElementById('qr-image');
+        const paidSection = document.getElementById('paid-section');
+        const changeSection = document.getElementById('change-section');
 
         let cartItems = [];
 
@@ -144,24 +156,31 @@
             totalInputHidden.value = total;
             totalInputDisplay.value = formatRupiah(total);
 
-            const paid = parseFloat(paidInput.value) || 0;
-            const change = paid - total;
-            changeInputHidden.value = change;
-            changeInputDisplay.value = formatRupiah(change);
-
-            const isCartEmpty = cartItems.length === 0;
-            const isPaidEnough = paid >= total;
-            const isPaymentMethodSelected = paymentMethodSelect.value !== '';
-
-            if (paid < total && !isCartEmpty) {
-                paidInput.classList.add('is-invalid');
-                document.getElementById('paid-feedback').textContent = 'Jumlah bayar kurang dari total belanja.';
+            if (paymentMethodSelect.value === 'qris') {
+                paidInput.value = total;
+                changeInputHidden.value = 0;
+                changeInputDisplay.value = formatRupiah(0);
+                processPaymentBtn.disabled = cartItems.length === 0 || paymentMethodSelect.value === '';
             } else {
-                paidInput.classList.remove('is-invalid');
-                document.getElementById('paid-feedback').textContent = '';
-            }
+                const paid = parseFloat(paidInput.value) || 0;
+                const change = paid - total;
+                changeInputHidden.value = change;
+                changeInputDisplay.value = formatRupiah(change);
 
-            processPaymentBtn.disabled = isCartEmpty || !isPaidEnough || !isPaymentMethodSelected;
+                const isCartEmpty = cartItems.length === 0;
+                const isPaidEnough = paid >= total;
+                const isPaymentMethodSelected = paymentMethodSelect.value !== '';
+
+                if (paid < total && !isCartEmpty) {
+                    paidInput.classList.add('is-invalid');
+                    document.getElementById('paid-feedback').textContent = 'Jumlah bayar kurang dari total belanja.';
+                } else {
+                    paidInput.classList.remove('is-invalid');
+                    document.getElementById('paid-feedback').textContent = '';
+                }
+
+                processPaymentBtn.disabled = isCartEmpty || !isPaidEnough || !isPaymentMethodSelected;
+            }
         }
 
         function addProductToCart(product) {
@@ -259,6 +278,24 @@
             });
         }
 
+        paymentMethodSelect.addEventListener('change', function () {
+            const selected = this.options[this.selectedIndex];
+            const qrCode = selected.getAttribute('data-qr');
+
+            if (this.value === 'qris') {
+                qrImage.src = qrCode;
+                qrContainer.style.display = 'block';
+                paidSection.style.display = 'none';
+                changeSection.style.display = 'none';
+            } else {
+                qrContainer.style.display = 'none';
+                qrImage.src = '';
+                paidSection.style.display = 'block';
+                changeSection.style.display = 'block';
+            }
+            updateTotals();
+        });
+
         let searchTimeout;
         productSearchInput.addEventListener('keyup', function () {
             clearTimeout(searchTimeout);
@@ -307,7 +344,6 @@
         });
 
         paidInput.addEventListener('input', updateTotals);
-        paymentMethodSelect.addEventListener('change', updateTotals);
 
         renderCart();
         updateTotals();
