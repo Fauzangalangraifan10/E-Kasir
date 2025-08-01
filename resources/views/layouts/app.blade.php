@@ -16,7 +16,7 @@
     <style>
         :root {
             --sidebar-bg: #e8f5e9;
-            --sidebar-width: 200px; /* Sidebar lebih kecil */
+            --sidebar-width: 200px;
             --content-bg: #ffffff;
             --active-color: #2e7d32;
             --hover-color: #c8e6c9;
@@ -222,6 +222,18 @@
                     <i class="fas fa-chart-bar"></i> Laporan
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->is('settings*') ? 'active' : '' }}" href="{{ route('settings.index') }}">
+                    <i class="fas fa-cogs"></i> Pengaturan Sistem
+                </a>
+            </li>
+            @if(Auth::check() && in_array(Auth::user()->role, ['admin','super_admin']))
+            <li class="nav-item">
+                <a class="nav-link {{ request()->is('users*') ? 'active' : '' }}" href="{{ route('users.index') }}">
+                    <i class="fas fa-users"></i> Manajemen User
+                </a>
+            </li>
+            @endif
         </ul>
     </div>
 

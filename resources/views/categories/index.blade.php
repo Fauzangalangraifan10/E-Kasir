@@ -90,8 +90,8 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h3 class="card-title mb-0">Daftar Kategori</h3>
 
-                    {{-- Tombol tambah kategori hanya untuk admin --}}
-                    @if(auth()->user()->role === 'admin')
+                    {{-- Tombol tambah kategori hanya untuk admin dan super admin --}}
+                   @if(auth()->user()->role === 'admin' || auth()->user()->role === 'super_admin')
                         <a href="{{ route('categories.create') }}" class="btn btn-primary btn-sm">
                             <i class="fas fa-plus"></i> Tambah Kategori
                         </a>
@@ -144,7 +144,7 @@
                                                 </a>
 
                                                 {{-- Hanya admin yang bisa edit dan hapus --}}
-                                                @if(auth()->user()->role === 'admin')
+                                                @if(auth()->user()->role === 'admin' || auth()->user()->role === 'super_admin')
                                                     <a href="{{ route('categories.edit', $category) }}" 
                                                        class="btn btn-sm btn-warning" title="Edit">
                                                         <i class="fas fa-edit"></i>
