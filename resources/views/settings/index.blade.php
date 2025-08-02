@@ -13,11 +13,7 @@
                     <i class="fas fa-store"></i> Profil Toko
                 </button>
             </li>
-            <li class="nav-item">
-                <button class="nav-link" id="tax-tab" data-bs-toggle="tab" data-bs-target="#tax" type="button" role="tab">
-                    <i class="fas fa-percent"></i> Pajak & Diskon
-                </button>
-            </li>
+           
             <li class="nav-item">
                 <button class="nav-link" id="payment-tab" data-bs-toggle="tab" data-bs-target="#payment" type="button" role="tab">
                     <i class="fas fa-credit-card"></i> Metode Pembayaran
@@ -26,21 +22,14 @@
         </ul>
 
         <div class="tab-content" id="settingsTabContent">
-            <!-- Profil Toko -->
+                    <!-- Profil Toko -->
             <div class="tab-pane fade show active" id="profile" role="tabpanel">
                 <form method="POST" action="{{ route('settings.updateProfile') }}" enctype="multipart/form-data">
                     @csrf
                     <div class="mb-3">
                         <label class="form-label">Nama Toko</label>
-                        <input type="text" name="store_name" class="form-control" value="{{ old('store_name', $settings->store_name ?? '') }}" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Alamat</label>
-                        <textarea name="address" class="form-control">{{ old('address', $settings->address ?? '') }}</textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">No. Telepon</label>
-                        <input type="text" name="phone" class="form-control" value="{{ old('phone', $settings->phone ?? '') }}">
+                        <input type="text" name="store_name" class="form-control" 
+                            value="{{ old('store_name', $settings->store_name ?? '') }}" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Logo</label>
@@ -48,24 +37,6 @@
                         @if(isset($settings->logo))
                             <img src="{{ asset('storage/'.$settings->logo) }}" alt="Logo" class="mt-2 rounded" height="50">
                         @endif
-                    </div>
-                    <button type="submit" class="btn btn-success">
-                        <i class="fas fa-save"></i> Simpan
-                    </button>
-                </form>
-            </div>
-
-            <!-- Pajak & Diskon -->
-            <div class="tab-pane fade" id="tax" role="tabpanel">
-                <form method="POST" action="{{ route('settings.updateTax') }}">
-                    @csrf
-                    <div class="mb-3">
-                        <label class="form-label">Pajak (%)</label>
-                        <input type="number" name="tax" class="form-control" value="{{ old('tax', $settings->tax ?? 10) }}" min="0" max="100">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Diskon Default (%)</label>
-                        <input type="number" name="discount" class="form-control" value="{{ old('discount', $settings->discount ?? 0) }}" min="0" max="100">
                     </div>
                     <button type="submit" class="btn btn-success">
                         <i class="fas fa-save"></i> Simpan

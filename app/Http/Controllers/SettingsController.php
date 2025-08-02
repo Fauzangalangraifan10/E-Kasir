@@ -1,7 +1,8 @@
 <?php
+
 namespace App\Http\Controllers;
 
-use App\Models\Settings;
+use App\Models\Setting;
 use App\Models\PaymentMethod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -10,7 +11,7 @@ class SettingsController extends Controller
 {
     public function index()
     {
-        $settings = Settings::first();
+        $settings = Setting::first();
         $payments = PaymentMethod::all();
         return view('settings.index', compact('settings', 'payments'));
     }
@@ -24,19 +25,23 @@ class SettingsController extends Controller
             'logo' => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
         ]);
 
-        $settings = Settings::firstOrNew();
+        $settings = Setting::firstOrNew([]);
+
         $settings->store_name = $request->store_name;
         $settings->address = $request->address;
         $settings->phone = $request->phone;
 
         if ($request->hasFile('logo')) {
+            // Hapus logo lama jika ada
             if ($settings->logo) {
                 Storage::delete('public/' . $settings->logo);
             }
+            // Simpan logo baru
             $settings->logo = $request->file('logo')->store('logos', 'public');
         }
 
         $settings->save();
+
         return back()->with('success', 'Profil toko berhasil diperbarui.');
     }
 
@@ -47,7 +52,7 @@ class SettingsController extends Controller
             'discount' => 'required|numeric|min:0|max:100',
         ]);
 
-        $settings = Settings::firstOrNew();
+        $settings = Setting::firstOrNew([]);
         $settings->tax = $request->tax;
         $settings->discount = $request->discount;
         $settings->save();
@@ -74,16 +79,20 @@ class SettingsController extends Controller
         }
 
         $payment->save();
+
         return back()->with('success', 'Metode pembayaran berhasil ditambahkan.');
     }
 
     public function deletePaymentMethod($id)
     {
         $payment = PaymentMethod::findOrFail($id);
+
         if ($payment->qr_code) {
             Storage::delete('public/' . $payment->qr_code);
         }
+
         $payment->delete();
+
         return back()->with('success', 'Metode pembayaran berhasil dihapus.');
     }
 }

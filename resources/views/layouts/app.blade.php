@@ -1,13 +1,17 @@
+@php
+    use App\Models\Setting;
+    $settings = Setting::first();
+@endphp
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Kasir App</title>
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="{{ asset('image/logo.png') }}">
+    <title>{{ $settings->store_name ?? 'Kasir App' }}</title>
+    <link rel="icon" type="image/png" 
+          href="{{ $settings && $settings->logo ? asset('storage/'.$settings->logo) : asset('image/logo.png') }}">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
@@ -191,8 +195,12 @@
     <div class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <div class="brand-wrapper">
-                <img src="{{ asset('image/logo.png') }}" alt="Logo">
-                <span class="brand-text">KasirApp</span>
+                @if($settings && $settings->logo)
+                    <img src="{{ asset('storage/'.$settings->logo) }}" alt="Logo">
+                @else
+                    <img src="{{ asset('image/logo.png') }}" alt="Logo">
+                @endif
+                <span class="brand-text">{{ $settings->store_name ?? 'KasirApp' }}</span>
             </div>
         </div>
 
