@@ -22,37 +22,60 @@
         .login-card {
             background: #fff;
             width: 100%;
-            max-width: 350px;
-            border-radius: 10px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
+            max-width: 370px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            padding: 25px;
             text-align: center;
-            animation: fadeIn 0.5s ease-in-out;
+            animation: fadeIn 0.6s ease-in-out;
             margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Background efek */
+        .login-card::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(56, 161, 105, 0.08) 0%, transparent 70%);
+            transform: rotate(25deg);
+            z-index: 0;
+            pointer-events: none; /* FIX supaya input & tombol bisa diklik */
+        }
+
+        /* Konten form berada di atas layer dekorasi */
+        .login-card * {
+            position: relative;
+            z-index: 1;
         }
 
         .login-logo {
-            max-width: 60px;
-            margin: 0 auto 10px;
+            max-width: 70px;
+            margin: 0 auto 12px;
             display: block;
+            animation: scaleUp 0.5s ease;
         }
 
         .login-title {
-            font-size: 1.1rem;
+            font-size: 1.3rem;
             font-weight: 700;
             color: #2f855a;
-            margin-bottom: 6px;
+            margin-bottom: 5px;
         }
 
         .text-muted {
             color: #718096;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             margin-bottom: 15px;
         }
 
         .form-group {
             text-align: left;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
 
         .input-label {
@@ -65,9 +88,9 @@
 
         .text-input {
             width: 100%;
-            border-radius: 6px;
+            border-radius: 8px;
             border: 1px solid #e2e8f0;
-            padding: 8px 12px;
+            padding: 10px 12px;
             font-size: 0.9rem;
             transition: all 0.3s ease;
         }
@@ -75,29 +98,50 @@
         .text-input:focus {
             outline: none;
             border-color: #38a169;
-            box-shadow: 0 0 0 1px rgba(56, 161, 105, 0.25);
+            box-shadow: 0 0 0 2px rgba(56, 161, 105, 0.2);
         }
 
         .btn-primary {
-            background-color: #2f855a;
+            background: linear-gradient(to right, #2f855a, #38a169);
             border: none;
             color: white;
             width: 100%;
             padding: 10px;
-            border-radius: 6px;
-            font-size: 0.9rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.3s ease;
+            transition: transform 0.2s ease, background 0.3s ease;
+            margin-top: 10px;
         }
 
         .btn-primary:hover {
-            background-color: #276749;
+            transform: scale(1.03);
+            background: linear-gradient(to right, #276749, #2f855a);
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .remember-me label {
+            font-size: 0.8rem;
+            color: #4a5568;
+            cursor: pointer;
+        }
+
+        .remember-me input[type="checkbox"] {
+            width: 14px;
+            height: 14px;
+            cursor: pointer;
         }
 
         .extra-links {
             margin-top: 15px;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             text-align: center;
         }
 
@@ -113,38 +157,23 @@
             text-decoration: underline;
         }
 
-        .remember-me {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            margin-bottom: 10px;
-        }
-
-        .remember-me label {
-            font-size: 0.8rem;
-            color: #4a5568;
-        }
-
-        .remember-me input[type="checkbox"] {
-            border-radius: 3px;
-            border: 1px solid #e2e8f0;
-            width: 14px;
-            height: 14px;
-            cursor: pointer;
-        }
-
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-5px); }
+            from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes scaleUp {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
         }
 
         @media (max-width: 480px) {
             .login-card {
-                max-width: 95%;
-                padding: 15px;
+                max-width: 92%;
+                padding: 20px;
             }
             .login-logo {
-                max-width: 50px;
+                max-width: 55px;
             }
         }
     </style>
@@ -164,13 +193,13 @@
 
                 <div class="form-group">
                     <label for="email" class="input-label">Email</label>
-                    <input id="email" class="text-input" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
+                    <input id="email" class="text-input" type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="username">
                     <x-input-error :messages="$errors->get('email')" class="mt-2" />
                 </div>
 
                 <div class="form-group">
                     <label for="password" class="input-label">Password</label>
-                    <input id="password" class="text-input" type="password" name="password" required autocomplete="current-password" />
+                    <input id="password" class="text-input" type="password" name="password" required autocomplete="current-password">
                     <x-input-error :messages="$errors->get('password')" class="mt-2" />
                 </div>
 

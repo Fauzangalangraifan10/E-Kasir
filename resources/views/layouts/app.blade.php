@@ -10,13 +10,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $settings->store_name ?? 'Kasir App' }}</title>
-    <link rel="icon" type="image/png" 
+
+    <link rel="icon" type="image/png"
           href="{{ $settings && $settings->logo ? asset('storage/'.$settings->logo) : asset('image/logo.png') }}">
+
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-
+    
     <style>
         :root {
             --sidebar-bg: #e8f5e9;
@@ -30,6 +34,8 @@
             display: flex;
             min-height: 100vh;
             background-color: #f5f5f5;
+            margin: 0;
+            font-family: 'Inter', sans-serif;
         }
 
         /* Sidebar */
@@ -92,6 +98,7 @@
             align-items: center;
             font-size: 0.9rem;
             transition: all 0.2s;
+            text-decoration: none;
         }
 
         .sidebar-nav .nav-link i {
@@ -127,7 +134,7 @@
             margin-left: 0;
         }
 
-        /* Navbar */
+        /* Top Navbar */
         .top-navbar {
             display: flex;
             justify-content: space-between;
@@ -171,7 +178,7 @@
             color: red;
         }
 
-        /* Responsive */
+        /* Media Queries for Responsiveness */
         @media (max-width: 768px) {
             .sidebar {
                 position: fixed;
@@ -191,7 +198,6 @@
     @stack('styles')
 </head>
 <body>
-    <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <div class="brand-wrapper">
@@ -245,9 +251,7 @@
         </ul>
     </div>
 
-    <!-- Main Content -->
     <div class="main-content" id="main-content">
-        <!-- Navbar -->
         <div class="top-navbar">
             <button class="hamburger-btn" id="sidebarToggle">
                 <i class="fas fa-bars"></i>
@@ -267,7 +271,6 @@
             @endauth
         </div>
 
-        <!-- Page Content -->
         <div class="p-3">
             @yield('content')
         </div>
@@ -291,7 +294,7 @@
                 }
             });
 
-            // SweetAlert notifications
+            // Tampil SweetAlert2 untuk pesan session
             @if (session('success'))
                 Swal.fire({
                     icon: 'success',
@@ -300,7 +303,6 @@
                     showConfirmButton: false,
                     timer: 3000
                 });
-                <?php session()->forget('success'); ?>
             @endif
 
             @if (session('error'))
@@ -310,15 +312,16 @@
                     text: '{{ session('error') }}',
                     showConfirmButton: true,
                 });
-                <?php session()->forget('error'); ?>
             @endif
         });
 
+        // Menutup sidebar di mobile saat mengklik di luar sidebar
         document.addEventListener('click', function(event) {
             const sidebar = document.getElementById('sidebar');
             const toggleBtn = document.getElementById('sidebarToggle');
 
             if (window.innerWidth <= 768 && sidebar.classList.contains('show')) {
+                // Periksa apakah klik terjadi di luar sidebar dan bukan pada tombol toggle
                 if (!sidebar.contains(event.target) && event.target !== toggleBtn) {
                     sidebar.classList.remove('show');
                 }

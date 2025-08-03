@@ -1,32 +1,45 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto p-6">
-    <h1 class="text-2xl font-bold mb-4 text-green-700">Edit Kategori</h1>
-
-    <form action="{{ route('categories.update', $category->id) }}" method="POST">
-        @csrf
-        @method('PUT')
-
-        <div class="mb-4">
-            <label for="name" class="block text-gray-700 font-semibold mb-2">Nama Kategori</label>
-            <input type="text" 
-                   name="name" 
-                   id="name" 
-                   value="{{ old('name', $category->name) }}"
-                   class="border border-gray-300 rounded p-2 w-full" 
-                   required>
-            @error('name')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-            @enderror
+<div class="container py-4">
+    <div class="card shadow border-0">
+        <div class="card-header bg-success bg-opacity-75 text-white d-flex justify-content-between align-items-center rounded-top">
+            <h4 class="mb-0"><i class="fas fa-tags me-2"></i> Edit Kategori</h4>
+            <a href="{{ route('categories.index') }}" class="btn btn-light btn-sm">
+                <i class="fas fa-arrow-left"></i> Kembali
+            </a>
         </div>
 
-        <div class="flex justify-end">
-            <a href="{{ route('categories.index') }}" 
-               class="bg-gray-500 text-white px-4 py-2 rounded mr-2">Batal</a>
-            <button type="submit" 
-                    class="bg-green-600 text-white px-4 py-2 rounded">Simpan</button>
+        <div class="card-body">
+            @if($errors->any())
+                <div class="alert alert-danger">
+                    <ul class="mb-0">
+                        @foreach($errors->all() as $err)
+                            <li>{{ $err }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <form action="{{ route('categories.update', $category->id) }}" method="POST">
+                @csrf
+                @method('PUT')
+
+                <div class="mb-3">
+                    <label for="name" class="form-label fw-semibold">Nama Kategori</label>
+                    <input type="text" name="name" id="name" class="form-control" value="{{ old('name', $category->name) }}" required>
+                </div>
+
+                <div class="mt-4 d-flex justify-content-end gap-2">
+                    <a href="{{ route('categories.index') }}" class="btn btn-secondary">
+                        <i class="fas fa-times me-1"></i> Batal
+                    </a>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save me-1"></i> Perbarui
+                    </button>
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
 </div>
 @endsection

@@ -22,37 +22,57 @@
         .register-card {
             background: #fff;
             width: 100%;
-            max-width: 500px;
-            border-radius: 10px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-            padding: 15px;
+            max-width: 400px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            padding: 25px;
             text-align: center;
-            animation: fadeIn 0.5s ease-in-out;
+            animation: fadeIn 0.6s ease-in-out;
             margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .register-card::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(56, 161, 105, 0.08) 0%, transparent 70%);
+            transform: rotate(25deg);
+            pointer-events: none;
+        }
+
+        .register-card * {
+            position: relative;
+            z-index: 1;
         }
 
         .register-logo {
-            max-width: 60px;
-            margin: 0 auto 10px;
+            max-width: 70px;
+            margin: 0 auto 12px;
             display: block;
+            animation: scaleUp 0.5s ease;
         }
 
         .register-title {
-            font-size: 1.1rem;
+            font-size: 1.3rem;
             font-weight: 700;
             color: #2f855a;
-            margin-bottom: 6px;
+            margin-bottom: 5px;
         }
 
         .text-muted {
             color: #718096;
-            font-size: 0.8rem;
-            margin-bottom: 10px;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
         }
 
         .form-group {
             text-align: left;
-            margin-bottom: 8px;
+            margin-bottom: 15px;
         }
 
         .input-label {
@@ -65,9 +85,9 @@
 
         .text-input, .select-input {
             width: 100%;
-            border-radius: 6px;
+            border-radius: 8px;
             border: 1px solid #e2e8f0;
-            padding: 6px 12px;
+            padding: 10px 12px;
             font-size: 0.9rem;
             transition: all 0.3s ease;
         }
@@ -75,7 +95,7 @@
         .text-input:focus, .select-input:focus {
             outline: none;
             border-color: #38a169;
-            box-shadow: 0 0 0 1px rgba(56, 161, 105, 0.25);
+            box-shadow: 0 0 0 2px rgba(56, 161, 105, 0.2);
         }
 
         .btn-container {
@@ -86,34 +106,52 @@
         }
 
         .btn-primary {
-            background-color: #2f855a;
+            background: linear-gradient(to right, #2f855a, #38a169);
             border: none;
             color: white;
-            padding: 6px 16px;
-            border-radius: 6px;
-            font-size: 0.9rem;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-size: 0.95rem;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.3s ease;
+            transition: transform 0.2s ease, background 0.3s ease;
         }
 
         .btn-primary:hover {
-            background-color: #276749;
+            transform: scale(1.03);
+            background: linear-gradient(to right, #276749, #2f855a);
         }
 
         .extra-links {
-            font-size: 0.75rem;
-            text-align: center;
-        }
-
-        .extra-links a {
+            font-size: 0.8rem;
             color: #2f855a;
-            text-decoration: none;
             font-weight: 600;
+            text-decoration: none;
         }
 
-        .extra-links a:hover {
+        .extra-links:hover {
             text-decoration: underline;
+            color: #276749;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes scaleUp {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        @media (max-width: 480px) {
+            .register-card {
+                max-width: 92%;
+                padding: 20px;
+            }
+            .register-logo {
+                max-width: 55px;
+            }
         }
     </style>
 
@@ -130,25 +168,25 @@
 
                 <div class="form-group">
                     <label for="name" class="input-label">Nama</label>
-                    <input id="name" class="text-input" type="text" name="name" :value="old('name')" required autofocus />
+                    <input id="name" class="text-input" type="text" name="name" value="{{ old('name') }}" required autofocus>
                     <x-input-error :messages="$errors->get('name')" class="mt-2" />
                 </div>
 
                 <div class="form-group">
                     <label for="email" class="input-label">Email</label>
-                    <input id="email" class="text-input" type="email" name="email" :value="old('email')" required />
+                    <input id="email" class="text-input" type="email" name="email" value="{{ old('email') }}" required>
                     <x-input-error :messages="$errors->get('email')" class="mt-2" />
                 </div>
 
                 <div class="form-group">
                     <label for="password" class="input-label">Kata Sandi</label>
-                    <input id="password" class="text-input" type="password" name="password" required />
+                    <input id="password" class="text-input" type="password" name="password" required>
                     <x-input-error :messages="$errors->get('password')" class="mt-2" />
                 </div>
 
                 <div class="form-group">
                     <label for="password_confirmation" class="input-label">Konfirmasi Kata Sandi</label>
-                    <input id="password_confirmation" class="text-input" type="password" name="password_confirmation" required />
+                    <input id="password_confirmation" class="text-input" type="password" name="password_confirmation" required>
                     <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
                 </div>
 

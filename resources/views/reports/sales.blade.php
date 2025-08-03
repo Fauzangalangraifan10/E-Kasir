@@ -1,62 +1,130 @@
-@extends('layouts.app') {{-- Asumsi ada layout dasar --}}
+@extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto p-4">
-    <h1 class="text-3xl font-bold mb-6">Laporan Penjualan</h1>
+<div class="p-4 md:p-6 bg-light min-vh-100">
+    <div class="container-fluid">
+        <!-- Header Halaman -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
+            <h1 class="h3 fw-bold text-dark mb-2">Laporan Penjualan</h1>
+            <p class="text-muted mb-0">Ringkasan transaksi dan pendapatan.</p>
+        </div>
 
-    <div class="bg-white p-6 rounded-lg shadow-md mb-6">
-        <form action="{{ route('reports.sales') }}" method="GET" class="flex flex-wrap items-end gap-4">
-            <div>
-                <label for="start_date" class="block text-sm font-medium text-gray-700">Dari Tanggal:</label>
-                <input type="date" id="start_date" name="start_date" value="{{ $startDate }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-            </div>
-            <div>
-                <label for="end_date" class="block text-sm font-medium text-gray-700">Sampai Tanggal:</label>
-                <input type="date" id="end_date" name="end_date" value="{{ $endDate }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-            </div>
-            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Filter</button>
-            <button type="submit" name="export_pdf" value="1" class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50">Export PDF</button>
-            <button type="submit" name="export_excel" value="1" class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50">Export Excel</button>
-        </form>
-    </div>
+        <!-- Panel Filter -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <form action="{{ route('reports.sales') }}" method="GET" class="row g-3 align-items-end">
+                    <!-- Filter Tanggal Mulai -->
+                    <div class="col-md-3">
+                        <label for="start_date" class="form-label fw-semibold">Dari Tanggal:</label>
+                        <input type="date" id="start_date" name="start_date" value="{{ $startDate }}" 
+                               class="form-control">
+                    </div>
 
-    <div class="overflow-x-auto bg-white rounded-lg shadow-md">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Transaksi</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Amount</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Metode Pembayaran</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Detail Produk</th>
-                </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-                {{-- Ubah $sales menjadi $transaction, dan saleItems menjadi details --}}
-                @forelse ($sales as $transaction)
-                <tr>
-                    <td class="px-6 py-4 whitespace-nowrap">{{ $transaction->id }}</td>
-                    {{-- Ubah transaction_date menjadi created_at --}}
-                    <td class="px-6 py-4 whitespace-nowrap">{{ $transaction->created_at->format('Y-m-d H:i') }}</td>
-                    {{-- Ubah total_amount menjadi total_price --}}
-                    <td class="px-6 py-4 whitespace-nowrap">Rp{{ number_format($transaction->total_price, 0, ',', '.') }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">{{ $transaction->payment_method ?? 'Cash' }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-900">
-                        <ul>
-                            {{-- Ubah saleItems menjadi details dan price_per_item menjadi price --}}
-                            @foreach ($transaction->details as $item)
-                                <li>{{ $item->product->name }} ({{ $item->quantity }}x @ Rp{{ number_format($item->price, 0, ',', '.') }})</li>
-                            @endforeach
-                        </ul>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="5" class="px-6 py-4 whitespace-nowrap text-center text-gray-500">Tidak ada data penjualan pada periode ini.</td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
+                    <!-- Filter Tanggal Akhir -->
+                    <div class="col-md-3">
+                        <label for="end_date" class="form-label fw-semibold">Sampai Tanggal:</label>
+                        <input type="date" id="end_date" name="end_date" value="{{ $endDate }}" 
+                               class="form-control">
+                    </div>
+
+                    <!-- Tombol Filter -->
+                    <div class="col-md-2">
+                        <button type="submit" 
+                                class="btn btn-success w-100">
+                            <i class="fas fa-filter me-1"></i> Filter
+                        </button>
+                    </div>
+
+                    <!-- Tombol PDF -->
+                    <div class="col-md-2">
+                        <button type="submit" name="export_pdf" value="1"
+                                class="btn btn-danger w-100">
+                            <i class="fas fa-file-pdf me-1"></i> PDF
+                        </button>
+                    </div>
+
+                    <!-- Tombol Excel -->
+                    <div class="col-md-2">
+                        <button type="submit" name="export_excel" value="1"
+                                class="btn btn-success w-100">
+                            <i class="fas fa-file-excel me-1"></i> Excel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Ringkasan Laporan -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 text-white bg-primary">
+                    <div class="card-body">
+                        <h6 class="text-white-50 mb-1">Total Pendapatan</h6>
+                        <h3 class="fw-bold mb-0">Rp{{ number_format($sales->sum('total_price'), 0, ',', '.') }}</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h6 class="text-muted mb-1">Jumlah Transaksi</h6>
+                        <h3 class="fw-bold mb-0">{{ $sales->count() }}</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h6 class="text-muted mb-1">Produk Terlaris</h6>
+                        <h5 class="fw-bold mb-0">{{ $bestSellingProduct->name ?? 'N/A' }}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabel Laporan Penjualan -->
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID Transaksi</th>
+                                <th>Tanggal</th>
+                                <th>Total Amount</th>
+                                <th>Metode Pembayaran</th>
+                                <th>Detail Produk</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($sales as $transaction)
+                            <tr>
+                                <td>{{ $transaction->id }}</td>
+                                <td>{{ $transaction->created_at->format('Y-m-d H:i') }}</td>
+                                <td class="fw-semibold text-success">Rp{{ number_format($transaction->total_price, 0, ',', '.') }}</td>
+                                <td>{{ $transaction->payment_method ?? 'Cash' }}</td>
+                                <td>
+                                    <ul class="mb-0">
+                                        @foreach ($transaction->details as $item)
+                                            <li>{{ $item->product->name }} ({{ $item->quantity }}x @ Rp{{ number_format($item->price, 0, ',', '.') }})</li>
+                                        @endforeach
+                                    </ul>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">
+                                    Tidak ada data penjualan pada periode ini.
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 @endsection

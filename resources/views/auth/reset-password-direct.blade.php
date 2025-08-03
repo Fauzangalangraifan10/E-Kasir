@@ -1,6 +1,8 @@
-<x-guest-layout>
+@extends('layouts.auth')
+
+@section('content')
     <style>
-        .login-container {
+        .reset-container {
             display: flex;
             align-items: center;
             justify-content: center;
@@ -8,7 +10,7 @@
             padding: 10px;
         }
 
-        .login-card {
+        .reset-card {
             background: #fff;
             width: 100%;
             max-width: 370px;
@@ -22,7 +24,7 @@
             overflow: hidden;
         }
 
-        .login-card::before {
+        .reset-card::before {
             content: "";
             position: absolute;
             top: -50%;
@@ -31,22 +33,23 @@
             height: 200%;
             background: radial-gradient(circle, rgba(56, 161, 105, 0.08) 0%, transparent 70%);
             transform: rotate(25deg);
-            pointer-events: none;
+            pointer-events: none; /* FIX supaya input & tombol bisa diklik */
         }
 
-        .login-card * {
+        /* Semua elemen di dalam card harus berada di atas layer dekorasi */
+        .reset-card * {
             position: relative;
             z-index: 1;
         }
 
-        .login-title {
+        .reset-title {
             font-size: 1.3rem;
             font-weight: 700;
             color: #2f855a;
             margin-bottom: 5px;
         }
 
-        .text-muted {
+        .reset-subtitle {
             color: #718096;
             font-size: 0.85rem;
             margin-bottom: 15px;
@@ -99,33 +102,63 @@
             background: linear-gradient(to right, #276749, #2f855a);
         }
 
+        .back-link {
+            display: block;
+            margin-top: 15px;
+            font-size: 0.8rem;
+            color: #2f855a;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: #276749;
+            text-decoration: underline;
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
-        @media (max-width: 480px) {
-            .login-card {
-                max-width: 92%;
-                padding: 20px;
-            }
-        }
     </style>
 
-    <div class="login-container">
-        <div class="login-card">
-            <h1 class="login-title">🔑 Lupa Password</h1>
-            <p class="text-muted">Masukkan email Anda untuk reset password langsung</p>
+    <div class="reset-container">
+        <div class="reset-card">
+            <h1 class="reset-title">🔒 Reset Password</h1>
+            <p class="reset-subtitle">Masukkan password baru Anda untuk melanjutkan</p>
 
-            <form method="POST" action="{{ route('password.redirect') }}">
+            <form method="POST" action="{{ route('password.reset.direct') }}">
                 @csrf
+                <input type="hidden" name="email" value="{{ $email }}">
+
                 <div class="form-group">
-                    <label for="email" class="input-label">Email</label>
-                    <input type="email" name="email" id="email" class="text-input" placeholder="Masukkan email Anda" required>
+                    <label for="password" class="input-label">Password Baru</label>
+                    <input type="password"
+                           name="password"
+                           id="password"
+                           class="text-input"
+                           placeholder="Minimal 8 karakter"
+                           required>
+                    @error('password')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
-                <button type="submit" class="btn-primary">Lanjutkan</button>
+                <div class="form-group">
+                    <label for="password_confirmation" class="input-label">Konfirmasi Password</label>
+                    <input type="password"
+                           name="password_confirmation"
+                           id="password_confirmation"
+                           class="text-input"
+                           placeholder="Ulangi password baru"
+                           required>
+                </div>
+
+                <button type="submit" class="btn-primary">Reset Password</button>
+
+                <a href="{{ route('login') }}" class="back-link">← Kembali ke Halaman Login</a>
             </form>
         </div>
     </div>
-</x-guest-layout>
+@endsection
