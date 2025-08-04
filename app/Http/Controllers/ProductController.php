@@ -45,6 +45,8 @@ class ProductController extends Controller
         return view('products.index', compact('products', 'categories', 'isKasir'));
     }
 
+
+    
     public function create()
     {
         if (auth()->user()->role === 'kasir') {
